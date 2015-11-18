@@ -1,6 +1,18 @@
 #!/usr/bin/python3
 import json
+import pymysql
+#import word2vec
 from flask import Flask, request, abort, redirect, url_for
+
+def connectToDatabase(config):
+    with open(config) as json_file:
+        data = json.load(json_file)
+        return pymysql.connect(host=data['hostname'], user=data['username'], passwd=data['password'], db=data['database'], port=int(data['port']))
+    return None
+
+# Connect to database with configuration
+conn = connectToDatabase('dbconfig.json')
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -32,7 +44,16 @@ Example:
 """
 @app.route("/get_recipe", methods=['GET'])
 def getRecipe():
-    return ""
+    data = ''
+    idval = request.args.get('id')
+    if idval:
+        cur = conn.cursor()
+        cur.execute("SELECT name FROM test where id=%s;", (idval))
+        row = cur.fetchone()
+        if row:
+            data = row[0]
+        cur.close()
+    return data
 
 if __name__ == "__main__":
     app.run(debug=True, port=4242, host='0.0.0.0')
