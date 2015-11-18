@@ -1,6 +1,7 @@
 {
-    "database": "",
-    "hostname": "localhost",
-    "password": "",
-    "username": ""
+    "db": "your_db_name",
+    "host": "your_db_server_ip",
+    "passwd": "your_user_password",
+    "user": "your_username",
+    "port": 3306
 }

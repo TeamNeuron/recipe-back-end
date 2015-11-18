@@ -7,7 +7,7 @@ from flask import Flask, request, abort, redirect, url_for
 def connectToDatabase(config):
     with open(config) as json_file:
         data = json.load(json_file)
-        return pymysql.connect(host=data['hostname'], user=data['username'], passwd=data['password'], db=data['database'], port=int(data['port']))
+        return pymysql.connect(**data)
     return None
 
 # Connect to database with configuration
@@ -57,3 +57,4 @@ def getRecipe():
 
 if __name__ == "__main__":
     app.run(debug=True, port=4242, host='0.0.0.0')
+
