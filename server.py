@@ -22,7 +22,7 @@ def queryDb(conn, query, args=(), one=False):
 
 @app.route('/')
 def version():
-    return 'Recipe backend v0.3'
+    return 'Recipe backend v0.4'
 
 
 
@@ -36,17 +36,28 @@ Example:
 """
 @app.route('/query', methods=['GET'])
 def query():
-    s = ''
-    for key, value in request.args.items():
-        s += '{} => {}<br>'.format(key, value)
-    return s
+    # Find all matches
+    matches = []
+    userIngredients = json.loads(request.args['ingredients'])
+    for ingredient in userIngredients:
+        if ingredient in ingredientsToRecipes:
+            matches += ingredientsToRecipes[ingredient]
+
+    # Build return object
+    results = []
+    for match in matches:
+        result = recipeData[match]
+        result['id'] = match
+        results.append(result)
+
+    return json.dumps(results)
 
 
 
 """
 Query the database for a recipe's memo data, which contains the steps to make the recipe.
 Input: ID of recipe
-Output: Recipe memo field
+Output: JSON object of recipe, which includes name, ingredients, and memo data
 
 Example:
     /get_recipe?id=42
