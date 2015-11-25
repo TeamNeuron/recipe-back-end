@@ -8,6 +8,7 @@ from flask import Flask, request, abort, redirect, url_for, g
 app = Flask(__name__)
 
 ingredientsToRecipes = {}
+recipeData = {}
 
 # Executes a SQL query and returns a list of dictionaries (of each result row)
 # Source: http://kevcoxe.github.io/Simple-Flask-App/
@@ -53,12 +54,16 @@ Example:
 @app.route('/get_recipe', methods=['GET'])
 def getRecipe():
     data = ''
-    idval = request.args.get('id')
-    if idval:
-        results = queryDb(g.db, 'SELECT * FROM recipes WHERE id=?', (idval,))
+    try:
+        idval = int(request.args.get('id'))
+        results = queryDb(g.db, 'SELECT memo FROM recipes WHERE id=?', (idval,))
         if len(results) >= 1:
-            results[0]['ingredients'] = results[0]['ingredients'].split('|')
-        data = json.dumps(results)
+            obj = recipeData[idval]
+            obj['memo'] = results[0]['memo']
+            obj['id'] = idval
+            data = json.dumps(obj)
+    except ValueError:
+        pass
     return data
 
 
@@ -88,14 +93,20 @@ def after_request(response):
 
 def buildIndex():
     conn = sqlite3.connect('recipes.db')
-    results = queryDb(conn, 'SELECT id, ingredients FROM recipes')
+    results = queryDb(conn, 'SELECT id, name, ingredients FROM recipes')
 
     for row in results:
-        ingredientList = row['ingredients'].split('|')
+        recipeId = int(row['id'])
+
+        # Update ingredients to recipes dictionary
+        ingredientList = sorted(list(set(row['ingredients'].split('|'))))
         for ingredient in ingredientList:
             if ingredient not in ingredientsToRecipes:
                 ingredientsToRecipes[ingredient] = []
-            ingredientsToRecipes[ingredient].append(int(row['id']))
+            ingredientsToRecipes[ingredient].append(recipeId)
+
+        # Update recipe metadata dictionary
+        recipeData[recipeId] = {'name': row['name'], 'ingredients': ingredientList}
 
     conn.close()
 
