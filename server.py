@@ -43,13 +43,32 @@ def query():
         if ingredient in ingredientsToRecipes:
             matches += ingredientsToRecipes[ingredient]
 
+    #add matches to dict. key is id, value is # times matched
+    weighted_matches = {}
+    for match in matches:
+        if match in weighted_matches:
+            weighted_matches[match] += 1
+        else
+            weighted_matches[match] = 1
+    # TODO: sort weighted_matches by values        
+    #replace matches with weighted_matches.keys() below
+    
+    # we only want to return the top 20% + 10 matches
+    num_matches = len(weighted_matches.keys())
+    if num_matches > 15:
+        num_results = ( num_matches * 0.2 ) + 10
+    else:
+        num_results = num_matches
+    
     # Build return object
     results = []
-    for match in matches:
+    i = 0
+    while i < num_results :
+        match = weighted_matches[i]
         result = recipeData[match]
         result['id'] = match
         results.append(result)
-
+        i++
     return json.dumps(results)
 
 
