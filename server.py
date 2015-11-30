@@ -22,7 +22,7 @@ def queryDb(conn, query, args=(), one=False):
 
 @app.route('/')
 def version():
-    return 'Recipe backend v0.4'
+    return 'Recipe backend v0.5'
 
 
 
@@ -48,27 +48,29 @@ def query():
     for match in matches:
         if match in weighted_matches:
             weighted_matches[match] += 1
-        else
+        else:
             weighted_matches[match] = 1
-    # TODO: sort weighted_matches by values        
+
+    # TODO: sort weighted_matches by values
     #replace matches with weighted_matches.keys() below
-    
+
     # we only want to return the top 20% + 10 matches
-    num_matches = len(weighted_matches.keys())
+    num_matches = len(weighted_matches)
     if num_matches > 15:
-        num_results = ( num_matches * 0.2 ) + 10
+        num_results = (num_matches * 0.2) + 10
     else:
         num_results = num_matches
-    
+
     # Build return object
     results = []
     i = 0
-    while i < num_results :
+    while i < num_results:
         match = weighted_matches[i]
         result = recipeData[match]
         result['id'] = match
         results.append(result)
-        i++
+        i += 1
+
     return json.dumps(results)
 
 
