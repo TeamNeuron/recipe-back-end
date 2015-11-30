@@ -57,14 +57,12 @@ def query():
     # we only want to return the top 20% + 10 matches
     num_matches = len(weighted_matches)
     if num_matches > 15:
-        num_results = (num_matches * 0.2) + 10
-    else:
-        num_results = num_matches
+        num_matches = 15
 
     # Build return object
     results = []
     i = 0
-    while i < num_results:
+    while i < num_matches:
         match = weighted_matches[i]
         result = recipeData[match]
         result['id'] = match
