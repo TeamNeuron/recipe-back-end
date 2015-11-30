@@ -4,6 +4,7 @@ import sqlite3
 import sys
 #import word2vec
 from flask import Flask, request, abort, redirect, url_for, g
+from collections import OrderedDict
 
 app = Flask(__name__)
 
@@ -50,24 +51,21 @@ def query():
             weighted_matches[match] += 1
         else:
             weighted_matches[match] = 1
-
-    # TODO: sort weighted_matches by values
-    #replace matches with weighted_matches.keys() below
-
-    # we only want to return the top 20% + 10 matches
-    num_matches = len(weighted_matches)
-    if num_matches > 15:
-        num_matches = 15
-
+    
+    #sort weighted_matches by values high to low
+    sorted_matches = OrderedDict(sorted(weighted_matches.items(), key=lambda x: x[1], reverse=True))
+   
     # Build return object
     results = []
     i = 0
-    while i < num_matches:
-        match = weighted_matches[i]
+    for key, value in sorted_matches.items():
+        i += 1
+        match = key
         result = recipeData[match]
         result['id'] = match
         results.append(result)
-        i += 1
+        if i >= 15:
+            break
 
     return json.dumps(results)
 
