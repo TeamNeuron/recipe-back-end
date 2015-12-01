@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Recipe Finder</title>
+		<link rel="stylesheet" href="site.css">
+	</head>
+
+	<body >
+		<nav id="nav01"></nav>
+		<div id="main">
+			<footer id="foot01"></footer>
+		</div>
+		<script src="script.js"></script>
+	</body>
+
+	<body>
+		<label>
+			<span><center><h1>Recipe Finder</h1></span>
+		</label>
+	</body>
+
+	<script>
+		function tform() {
+			var x= document.forms["recipe"]["ing1"].value;
+			if (x ==null || x == "") {
+				alert("please enter some ingredient");
+				return false;
+			}
+		}
+	</script>
+
+	<body>
+		<div id="section1">
+
+	<form method="post" action="/predict">
+  <input type="text" name="ingredient0" size="35" maxlength="255" placeholder = "Enter Ingredient 1 URL" value="test1"/><br>
+  <input type="text" name="ingredient1" size="35" maxlength="255" placeholder = "Enter Ingredient 2 URL" value="test2"/><br>
+  <input type="text" name="ingredient2" size="35" maxlength="255" placeholder = "Enter Ingredient 3 URL" value="test3"/><br>
+  <left><input type="submit" value="Submit" />	</left>
+	</form>
+
+	</div>
+	<br><br><br>
+	</body>
+</html>;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+ <body>
+			<center><div id="uploads"></div>
+			<div class="dropzone" id="dropzone">Drop files here to upload</div></center>
+
+			<script>
+				(function () {
+					var dropzone = document.getElementById('dropzone');
+
+					dropzone.ondrop = function(e) {
+						e.preventDefault();
+						this.className = 'dropzone';
+						console.log(e);
+
+					};
+
+
+
+					dropzone.ondragover = function() {
+						this.className = 'dropzone dragover';
+						return false;
+					};
+
+					dropzone.ondragleave = function() {
+						this.className = 'dropzone';
+						return false;
+					};
+
+			}());
+
+			</script>
+
+			</body>
+
+ -->
