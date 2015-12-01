@@ -210,4 +210,4 @@ def buildIndex():
 
 if __name__ == '__main__':
     buildIndex()
-    app.run(debug=True, port=4242, host='0.0.0.0')
+    app.run(debug=True, port=80, host='0.0.0.0')
