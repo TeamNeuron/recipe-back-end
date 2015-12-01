@@ -30,14 +30,13 @@ def queryDb(conn, query, args=(), one=False):
 
 
 def getRecipes(userIngredients):
-    # Find all matches
-
-    matches = defaultdict(int)
     # {recipeId: weight}
-    # {27: 1, 53: 3, ...}
+    matches = defaultdict(int)
 
+    # Find all matches
     for ingredient in userIngredients:
         # Find all recipe IDs with each ingredient
+        # WARNING: Prone to SQL injections, should definitely fix this
         results = queryDb(g.db, "select id from recipes where ingredients like '%%%s%%'" % ingredient)
 
         # Keep track of ingredient occurances by weight
@@ -62,29 +61,60 @@ def getRecipes(userIngredients):
 
     return json.dumps(results)
 
+
+def imagesToText(imageUrls):
+    # Call metamind API to return image classifications from URLs
+    metamindResults = classifier.predict(imageUrls, input_type='urls')
+
+    ingredients = []
+    for result in metamindResults:
+        ingredients.append(result['label'])
+
+    return ingredients
+
+
 @app.route('/')
 def version():
-    return 'Recipe backend v0.6'
+    return 'Recipe backend v0.7'
 
-@app.route('/predict', methods=['POST'])
+"""
+Our magic API call.
+Input: Image URLs of ingredients
+Output: Recipes that require those ingredients, sorted by relevance
+
+Example:
+    /predict?ingredients=['http://pngimg.com/upload/egg_PNG25.png','https://upload.wikimedia.org/wikipedia/commons/7/78/Salt_shaker_on_white_background.jpg']
+"""
+@app.route('/predict', methods=['POST', 'GET'])
 def predict():
+    # Gets image URLs from user request
+    imageUrls = []
+    if request.method == 'POST':
+        for key, value in request.form.items():
+            if key.startswith('ingredient') and value:
+                imageUrls.append(value)
+    else:
+        imageUrls = json.loads(request.args['ingredients'])
+
+    # Convert image URLs to ingredient names
+    ingredients = imagesToText(imageUrls)
+
+    # Search for recipes with the ingredient names
+    return getRecipes(ingredients)
+
+"""
+Route to handle converting images of ingredients to ingredient names.
+"""
+@app.route('/images_to_text', methods=['POST'])
+def imagesToTextHandler():
     # Gets image URLs from user request
     imageUrls = []
     for key, value in request.form.items():
         if key.startswith('ingredient') and value:
             imageUrls.append(value)
 
-    print 'imageUrls: {}'.format(imageUrls)
-
-    # TODO: change request.args function
-    # imageUrls = json.loads(request.args['urls'])
-    list_results = classifier.predict(imageUrls, input_type='urls')
-
-    print 'list_results: {}'.format(list_results)
-
-    ingredients = []
-    for result in list_results:
-        ingredients.append(result['label'])
+    # Magic happens
+    ingredients = imagesToText(imageUrls)
 
     return json.dumps(ingredients)
 
