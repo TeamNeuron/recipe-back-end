@@ -5,6 +5,7 @@ import sys
 #import word2vec
 from flask import Flask, request, abort, redirect, url_for, g
 from collections import OrderedDict
+from collections import defaultdict
 
 # to install metamind api
 # run the command: pip install MetaMindApi --upgrade
@@ -27,6 +28,39 @@ def queryDb(conn, query, args=(), one=False):
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
 
+
+def getRecipes(userIngredients):
+    # Find all matches
+
+    matches = defaultdict(int)
+    # {recipeId: weight}
+    # {27: 1, 53: 3, ...}
+
+    for ingredient in userIngredients:
+        # Find all recipe IDs with each ingredient
+        results = queryDb(g.db, "select id from recipes where ingredients like '%%%s%%'" % ingredient)
+
+        # Keep track of ingredient occurances by weight
+        for row in results:
+            recipeId = int(row['id'])
+            matches[recipeId] += 1
+
+    # Sort matches by weight (largest weight first)
+    sortedMatches = OrderedDict(sorted(matches.items(), key=lambda x: x[1], reverse=True))
+
+    # Build return object
+    results = []
+    i = 0
+    for key, value in sortedMatches.items():
+        i += 1
+        result = recipeData[key]
+        result['id'] = key
+        result['weight'] = value
+        results.append(result)
+        if i >= 15:
+            break
+
+    return json.dumps(results)
 
 @app.route('/')
 def version():
@@ -65,37 +99,8 @@ Example:
 
 @app.route('/query', methods=['GET'])
 def query():
-    # Find all matches
-    matches = []
     userIngredients = json.loads(request.args['ingredients'])
-    for ingredient in userIngredients:
-        if ingredient in ingredientsToRecipes:
-            matches += ingredientsToRecipes[ingredient]
-
-    #add matches to dict. key is id, value is # times matched
-    weighted_matches = {}
-    for match in matches:
-        if match in weighted_matches:
-            weighted_matches[match] += 1
-        else:
-            weighted_matches[match] = 1
-
-    #sort weighted_matches by values high to low
-    sorted_matches = OrderedDict(sorted(weighted_matches.items(), key=lambda x: x[1], reverse=True))
-
-    # Build return object
-    results = []
-    i = 0
-    for key, value in sorted_matches.items():
-        i += 1
-        match = key
-        result = recipeData[match]
-        result['id'] = match
-        results.append(result)
-        if i >= 15:
-            break
-
-    return json.dumps(results)
+    return getRecipes(userIngredients)
 
 
 
