@@ -5,12 +5,15 @@ import sys
 #import word2vec
 from flask import Flask, request, abort, redirect, url_for, g
 from collections import OrderedDict
+
+# to install metamind api 
+# run the command: pip install MetaMindApi --upgrade
 from metamind.api import ClassificationData, ClassificationModel, set_api_key
 
 app = Flask(__name__)
 
 #set info for metamind
-set_api_key('Authorization: Basic wC5gH0A9hi37QAQA3i5oH045ofG1jNV07FhLQ1iwe5rmIJBtET')
+set_api_key('wC5gH0A9hi37QAQA3i5oH045ofG1jNV07FhLQ1iwe5rmIJBtET')
 classifier = ClassificationModel(id='40438')
 
 ingredientsToRecipes = {}
@@ -23,7 +26,6 @@ def queryDb(conn, query, args=(), one=False):
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
-
 
 
 @app.route('/')
