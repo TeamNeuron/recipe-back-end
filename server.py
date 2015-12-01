@@ -3,7 +3,7 @@ import json
 import sqlite3
 import sys
 #import word2vec
-from flask import Flask, request, abort, redirect, url_for, g
+from flask import Flask, request, abort, redirect, url_for, g, send_file
 from collections import OrderedDict
 from collections import defaultdict
 
@@ -72,6 +72,10 @@ def imagesToText(imageUrls):
 
     return ingredients
 
+
+@app.route('/')
+def index():
+    return send_file('index.html')
 
 @app.route('/version')
 def version():
