@@ -3,7 +3,7 @@ import json
 import sqlite3
 import sys
 #import word2vec
-from flask import Flask, request, abort, redirect, url_for, g, send_file
+from flask import Flask, request, abort, redirect, url_for, g, render_template
 from collections import OrderedDict
 from collections import defaultdict
 
@@ -59,7 +59,7 @@ def getRecipes(userIngredients):
         if i >= 15:
             break
 
-    return json.dumps(results)
+    return results
 
 
 def imagesToText(imageUrls):
@@ -75,7 +75,7 @@ def imagesToText(imageUrls):
 
 @app.route('/')
 def index():
-    return send_file('index.html')
+    return render_template('index.html')
 
 @app.route('/version')
 def version():
@@ -104,7 +104,7 @@ def predict():
     ingredients = imagesToText(imageUrls)
 
     # Search for recipes with the ingredient names
-    return getRecipes(ingredients)
+    return render_template('recipes.html', recipes=getRecipes(ingredients))
 
 """
 Route to handle converting images of ingredients to ingredient names.
@@ -137,7 +137,7 @@ Example:
 @app.route('/query', methods=['GET'])
 def query():
     userIngredients = json.loads(request.args['ingredients'])
-    return getRecipes(userIngredients)
+    return json.dumps(getRecipes(userIngredients))
 
 
 
@@ -191,7 +191,7 @@ def after_request(response):
 
 def buildIndex():
     conn = sqlite3.connect('recipes.db')
-    results = queryDb(conn, 'SELECT id, name, ingredients FROM recipes')
+    results = queryDb(conn, 'SELECT * FROM recipes')
 
     for row in results:
         recipeId = int(row['id'])
@@ -204,10 +204,10 @@ def buildIndex():
             ingredientsToRecipes[ingredient].append(recipeId)
 
         # Update recipe metadata dictionary
-        recipeData[recipeId] = {'name': row['name'], 'ingredients': ingredientList}
+        recipeData[recipeId] = {'name': row['name'], 'ingredients': ingredientList, 'memo': row['memo']}
 
     conn.close()
 
 if __name__ == '__main__':
     buildIndex()
-    app.run(debug=True, port=80, host='0.0.0.0')
+    app.run(debug=True, port=4242, host='0.0.0.0')

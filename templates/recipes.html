@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% import 'macros.html' as macros %}
+{% block body %}
+
+<h1>Recipe Search Results</h1>
+<hr>
+
+<div class="container">
+    {{ macros.list_items(recipes=recipes) }}
+</div>
+{% endblock %}
