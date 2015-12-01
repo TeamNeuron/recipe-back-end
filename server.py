@@ -11,7 +11,7 @@ from collections import defaultdict
 # run the command: pip install MetaMindApi --upgrade
 from metamind.api import ClassificationData, ClassificationModel, set_api_key
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
 #set info for metamind
 set_api_key('asAj55GwZA6r4nO9ijVGWxhbHWHuGVFcUkfxo8b8Tq6aLHqOCH')
@@ -73,7 +73,7 @@ def imagesToText(imageUrls):
     return ingredients
 
 
-@app.route('/')
+@app.route('/version')
 def version():
     return 'Recipe backend v0.7'
 
