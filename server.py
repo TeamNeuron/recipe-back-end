@@ -5,8 +5,13 @@ import sys
 #import word2vec
 from flask import Flask, request, abort, redirect, url_for, g
 from collections import OrderedDict
+from metamind.api import ClassificationData, ClassificationModel, set_api_key
 
 app = Flask(__name__)
+
+#set info for metamind
+set_api_key('Authorization: Basic wC5gH0A9hi37QAQA3i5oH045ofG1jNV07FhLQ1iwe5rmIJBtET')
+classifier = ClassificationModel(id='40438')
 
 ingredientsToRecipes = {}
 recipeData = {}
@@ -25,7 +30,16 @@ def queryDb(conn, query, args=(), one=False):
 def version():
     return 'Recipe backend v0.5'
 
-
+@app.route('/predict', methods=['POST'])
+def predict():
+    ingredients = []
+    
+    # TODO: change request.args function
+    imageUrls = json.loads(request.args['urls'])
+    list_results = classifier.predict(imageUrls, input_type='urls')
+    
+    for result in list_results:
+        ingredients.append(result['label'])
 
 """
 Query the database for a list of recipe IDs and names.
@@ -35,6 +49,7 @@ Output: JSON array of objects, each with a recipe ID, name, and ingredients
 Example:
     /query?ingredients=['sugar', 'milk', 'eggs']
 """
+
 @app.route('/query', methods=['GET'])
 def query():
     # Find all matches
