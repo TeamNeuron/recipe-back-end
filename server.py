@@ -6,15 +6,15 @@ import sys
 from flask import Flask, request, abort, redirect, url_for, g
 from collections import OrderedDict
 
-# to install metamind api 
+# to install metamind api
 # run the command: pip install MetaMindApi --upgrade
 from metamind.api import ClassificationData, ClassificationModel, set_api_key
 
 app = Flask(__name__)
 
 #set info for metamind
-set_api_key('wC5gH0A9hi37QAQA3i5oH045ofG1jNV07FhLQ1iwe5rmIJBtET')
-classifier = ClassificationModel(id='40438')
+set_api_key('asAj55GwZA6r4nO9ijVGWxhbHWHuGVFcUkfxo8b8Tq6aLHqOCH')
+classifier = ClassificationModel(id='40466')
 
 ingredientsToRecipes = {}
 recipeData = {}
@@ -30,18 +30,29 @@ def queryDb(conn, query, args=(), one=False):
 
 @app.route('/')
 def version():
-    return 'Recipe backend v0.5'
+    return 'Recipe backend v0.6'
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    ingredients = []
-    
+    # Gets image URLs from user request
+    imageUrls = []
+    for key, value in request.form.items():
+        if key.startswith('ingredient') and value:
+            imageUrls.append(value)
+
+    print 'imageUrls: {}'.format(imageUrls)
+
     # TODO: change request.args function
-    imageUrls = json.loads(request.args['urls'])
+    # imageUrls = json.loads(request.args['urls'])
     list_results = classifier.predict(imageUrls, input_type='urls')
-    
+
+    print 'list_results: {}'.format(list_results)
+
+    ingredients = []
     for result in list_results:
         ingredients.append(result['label'])
+
+    return json.dumps(ingredients)
 
 """
 Query the database for a list of recipe IDs and names.
@@ -68,10 +79,10 @@ def query():
             weighted_matches[match] += 1
         else:
             weighted_matches[match] = 1
-    
+
     #sort weighted_matches by values high to low
     sorted_matches = OrderedDict(sorted(weighted_matches.items(), key=lambda x: x[1], reverse=True))
-   
+
     # Build return object
     results = []
     i = 0
@@ -156,9 +167,5 @@ def buildIndex():
     conn.close()
 
 if __name__ == '__main__':
-    # Ensure Python 3 is being used
-    if sys.version_info[0] == 3:
-        buildIndex()
-        app.run(debug=True, port=4242, host='0.0.0.0')
-    else:
-        print('Error: Must be running Python 3')
+    buildIndex()
+    app.run(debug=True, port=4242, host='0.0.0.0')
