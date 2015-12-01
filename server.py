@@ -105,13 +105,16 @@ def predict():
 """
 Route to handle converting images of ingredients to ingredient names.
 """
-@app.route('/images_to_text', methods=['POST'])
+@app.route('/images_to_text', methods=['POST', 'GET'])
 def imagesToTextHandler():
     # Gets image URLs from user request
     imageUrls = []
-    for key, value in request.form.items():
-        if key.startswith('ingredient') and value:
-            imageUrls.append(value)
+    if request.method == 'POST':
+        for key, value in request.form.items():
+            if key.startswith('ingredient') and value:
+                imageUrls.append(value)
+    else:
+        imageUrls = json.loads(request.args['ingredients'])
 
     # Magic happens
     ingredients = imagesToText(imageUrls)
