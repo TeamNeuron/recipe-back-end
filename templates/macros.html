@@ -4,11 +4,15 @@
 <div class="col-md-12">
     <div class="well">
         <h2>{{ recipe['name'] }}</h2>
-        <p>Ingredients:
-            {% for ingredient in recipe['ingredients'] %}
-                <li>{{ ingredient }}</li>
-            {% endfor %}
-        </p>
+        <div class="ingredients">
+            <p>Ingredients:
+                <ul>
+                {% for ingredient in recipe['ingredients'] %}
+                    <li>{{ ingredient }}</li>
+                {% endfor %}
+                </ul>
+            </p>
+        </div>
         <p>Description: {{ recipe['memo'] }}</p>
         <p><input type="submit" class="btn btn-lg btn-danger" value="Print"></input></p>
     </div>

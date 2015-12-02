@@ -5,6 +5,17 @@
 <h1>Recipe Search Results</h1>
 <hr>
 
+<div class="ingredients">
+    <h3>Searching for:</h3>
+    <p>
+        <ul>
+        {% for ingredient in ingredients %}
+            <li>{{ ingredient }}</li>
+        {% endfor %}
+        </ul>
+    </p>
+</div>
+
 <div class="container">
     {{ macros.list_items(recipes=recipes) }}
 </div>

@@ -104,7 +104,7 @@ def predict():
     ingredients = imagesToText(imageUrls)
 
     # Search for recipes with the ingredient names
-    return render_template('recipes.html', recipes=getRecipes(ingredients))
+    return render_template('recipes.html', recipes=getRecipes(ingredients), ingredients=ingredients)
 
 """
 Route to handle converting images of ingredients to ingredient names.
