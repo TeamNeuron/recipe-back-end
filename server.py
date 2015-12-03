@@ -15,7 +15,7 @@ app = Flask(__name__, static_folder='assets')
 
 #set info for metamind
 set_api_key('asAj55GwZA6r4nO9ijVGWxhbHWHuGVFcUkfxo8b8Tq6aLHqOCH')
-classifier = ClassificationModel(id='40466')
+classifier = ClassificationModel(id='40493')
 
 ingredientsToRecipes = {}
 recipeData = {}
